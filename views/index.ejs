@@ -1,0 +1,96 @@
+<%- include('partials/header') %>
+    <style>
+        #customers {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #customers td, #customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #customers tr:nth-child(even){background-color: #f2f2f2;}
+
+        #customers tr:hover {background-color: #ddd;}
+
+        #customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .add_user_btn {
+            float: right;
+            margin: 10px;
+        }
+
+        .home_btn {
+            display: none;
+        }
+
+        .profile_img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+    </style>
+<a class="button add_user_btn" href="/add-user">Add User</a>
+<table id="customers">
+    <tr>
+        <th>Profile Image</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Update</th>
+        <th>Delete</th>
+
+    </tr>
+
+    <% if (users.length > 0) {
+    users.forEach((user, i) => { %>
+        <tr>
+            <td><img class="profile_img" src="img/<%= user.profile_img %>" width="100px" alt=""></td>
+            <td><%= user.first_name %></td>
+            <td><%= user.last_name %></td>
+            <td><%= user.email %></td>
+            <td><a class="button" href="/user/<%= user.id %>">Edit</a></td>
+            <td><button class="button delete" id="<%= user.id %>">Delete</button></td>
+        </tr>
+    <% })
+    } else { %>
+        <tr><td colspan="6">No user found.</td></tr>
+    <% } %>
+
+</table>
+
+<%- include('partials/footer') %>
+
+<script>
+    window.addEventListener("DOMContentLoaded", function () {
+        console.log("loaded!");
+        const clickHandler = function (event) {
+            console.log(event.currentTarget.id);
+            fetch("/delete-user", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({ id: event.currentTarget.id }),
+            })
+                .then(() => {
+                    window.location.reload();
+                })
+                .catch((err) => {
+                    console.log("Error", err);
+                });
+        };
+        Array.from(document.getElementsByClassName("delete")).forEach((btn) => {
+            btn.addEventListener("click", clickHandler, false);
+        });
+    });
+</script>
